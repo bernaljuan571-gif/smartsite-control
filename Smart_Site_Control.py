@@ -350,8 +350,10 @@ col1.metric("Horas Máquina (promedio/día)", f"{horas_maquina} h")
 col2.metric("Personal en Obra", f"{personal_en_obra}")
 
 if horas_maquina < 6:
-    st.warning("⚠️ Subutilización de maquinaria detectada")nelse:
+    st.warning("⚠️ Subutilización de maquinaria detectada")
+else:
     st.success("✅ Uso adecuado de maquinaria")
+
 
 st.divider()
 
@@ -419,6 +421,7 @@ st.header("🚀 Propuesta de Valor")
 st.success("SmartSite Control transforma la obra tradicional en una obra inteligente, permitiendo decisiones basadas en datos, no en suposiciones.")
 
 st.caption("Smart Construction | Ecuador")
+
 
 
 
