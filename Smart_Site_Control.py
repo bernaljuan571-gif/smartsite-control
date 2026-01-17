@@ -1,10 +1,10 @@
-# =====================================================
-# SMARTSITE CONTROL – SEGUIMIENTO REAL DE OBRA
-# Autor: Grupo5 – Ingeniería Civil
-# =====================================================
-
 import streamlit as st
 import pandas as pd
+import io
+from datetime import datetime
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4
 
 # -----------------------------------------------------
 # CONFIGURACIÓN INICIAL
@@ -18,319 +18,136 @@ st.set_page_config(
 # -----------------------------------------------------
 # LOGIN
 # -----------------------------------------------------
-USUARIO_VALIDO ="admin"
-CLAVE_VALIDA ="1234"
+USUARIO_VALIDO = "admin"
+CLAVE_VALIDA = "1234"
 
 if "autenticado" not in st.session_state:
     st.session_state.autenticado = False
 
 if not st.session_state.autenticado:
     st.title("🔐 Acceso al Sistema")
-
     usuario = st.text_input("Usuario")
     clave = st.text_input("Contraseña", type="password")
-
     if st.button("Ingresar"):
         if usuario == USUARIO_VALIDO and clave == CLAVE_VALIDA:
             st.session_state.autenticado = True
             st.rerun()
         else:
             st.error("Usuario o contraseña incorrectos")
-
     st.stop()
 
 # -----------------------------------------------------
 # APP PRINCIPAL
 # -----------------------------------------------------
 st.title("🏗️ SmartSite Control")
-st.subheader("Sistema real de seguimiento de obra")
+st.subheader("Sistema de seguimiento real de obra")
+
+# --- BARRA LATERAL: ADJUNTAR PDFS ---
+with st.sidebar:
+    st.header("📁 Documentación")
+    archivos_pdf = st.file_uploader(
+        "Adjuntar PDFs (Planos/Informes)", 
+        type=["pdf"], 
+        accept_multiple_files=True
+    )
 
 st.divider()
 
 # -----------------------------------------------------
-# CARGA DE ARCHIVO EXCEL
+# NUEVA SECCIÓN: DESCARGA DE PLANTILLA EXCEL
 # -----------------------------------------------------
-st.header("📂 Carga de información de obra")
+st.header("📥 Preparación de Datos")
+col_plantilla, col_info = st.columns([1, 2])
 
-archivo = st.file_uploader(
-    "Suba el archivo Excel de seguimiento",
-    type=["xlsx"]
-)
+with col_plantilla:
+    st.write("¿No tiene el formato?")
+    
+    # Crear un DataFrame de ejemplo para la plantilla
+    df_plantilla = pd.DataFrame({
+        "Actividad": ["Excavación", "Hormigón de Cimentación", "Acero de Refuerzo"],
+        "Área": ["Estructura", "Estructura", "Estructura"],
+        "Unidad": ["m3", "m3", "kg"],
+        "Cantidad_Total": [100, 50, 1000],
+        "Cantidad_Ejecutada": [0, 0, 0]
+    })
 
-if archivo is None:
-    st.info("📌 Para continuar, cargue el archivo Excel con los datos reales de la obra.")
-    st.stop()
+    # Función para convertir DF a Excel en memoria
+    def to_excel(df):
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Seguimiento')
+        return output.getvalue()
 
-# -----------------------------------------------------
-# LECTURA Y VALIDACIÓN DEL EXCEL
-# -----------------------------------------------------
-try:
-    df = pd.read_excel(archivo)
-except Exception as e:
-    st.error("Error al leer el archivo Excel")
-    st.stop()
+    excel_data = to_excel(df_plantilla)
 
-columnas_obligatorias = [
-    "Actividad",
-    "Área",
-    "Unidad",
-    "Cantidad_Total",
-    "Cantidad_Ejecutada"
-]
+    st.download_button(
+        label="🟢 Descargar Plantilla Excel",
+        data=excel_data,
+        file_name="Plantilla_SmartSite_Control.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
-for col in columnas_obligatorias:
-    if col not in df.columns:
-        st.error(f"Falta la columna obligatoria: {col}")
-        st.stop()
-
-# -----------------------------------------------------
-# CÁLCULO DE PORCENTAJES
-# -----------------------------------------------------
-df["Porcentaje_Avance"] = (
-    df["Cantidad_Ejecutada"] / df["Cantidad_Total"] * 100
-).round(2)
-
-# -----------------------------------------------------
-# MÉTRICAS GENERALES
-# -----------------------------------------------------
-st.header("📊 Indicadores Generales")
-
-avance_global = df["Porcentaje_Avance"].mean()
-
-col1, col2 = st.columns(2)
-col1.metric("Avance Global (%)", f"{avance_global:.2f}")
-
-total_partidas = len(df)
-col2.metric("Partidas Registradas", total_partidas)
+with col_info:
+    st.info("""
+    **Instrucciones:**
+    1. Descargue la plantilla.
+    2. Complete las columnas 'Cantidad_Total' y 'Cantidad_Ejecutada'.
+    3. Suba el archivo en la sección de abajo para ver el progreso.
+    """)
 
 st.divider()
 
 # -----------------------------------------------------
-# AVANCE POR ÁREA
+# CARGA Y PROCESAMIENTO
 # -----------------------------------------------------
-st.header("🏗️ Avance por Área")
+st.header("📂 Carga de Seguimiento")
+archivo = st.file_uploader("Suba su Excel completado", type=["xlsx"])
 
-avance_area = (
-    df.groupby("Área")["Porcentaje_Avance"]
-    .mean()
-    .reset_index()
-)
+if archivo:
+    try:
+        df = pd.read_excel(archivo)
+        
+        columnas_obligatorias = ["Actividad", "Área", "Unidad", "Cantidad_Total", "Cantidad_Ejecutada"]
+        if all(col in df.columns for col in columnas_obligatorias):
+            
+            # Cálculos
+            df["Porcentaje_Avance"] = (df["Cantidad_Ejecutada"] / df["Cantidad_Total"] * 100).round(2)
+            avance_global = df["Porcentaje_Avance"].mean()
 
-st.dataframe(avance_area, use_container_width=True)
+            # Métricas con 2 decimales
+            st.header("📊 Indicadores Generales")
+            c1, c2 = st.columns(2)
+            c1.metric("Avance Físico Global", f"{avance_global:.2f}%")
+            c2.metric("Partidas en Seguimiento", len(df))
 
-st.divider()
+            st.divider()
 
-# -----------------------------------------------------
-# ALERTAS REALES
-# -----------------------------------------------------
-st.header("🚨 Alertas Técnicas")
+            # Ranking Formateado
+            st.header("🏆 Ranking de Frentes de Trabajo")
+            ranking = df.groupby("Área")["Porcentaje_Avance"].mean().sort_values(ascending=False).reset_index()
+            ranking["Porcentaje_Avance"] = ranking["Porcentaje_Avance"].map("{:.2f}%".format)
+            st.table(ranking)
 
-UMBRAL = 50
+            # Detalle de Partidas
+            st.header("📋 Detalle de Obra")
+            df_mostrar = df.copy()
+            df_mostrar["Porcentaje_Avance"] = df_mostrar["Porcentaje_Avance"].map("{:.2f}%".format)
+            st.dataframe(df_mostrar, use_container_width=True)
 
-hay_alertas = False
+            # Mostrar PDFs si existen
+            if archivos_pdf:
+                st.divider()
+                st.header("📑 Documentación Adjunta")
+                for pdf in archivos_pdf:
+                    st.download_button(f"📥 Descargar: {pdf.name}", data=pdf.read(), file_name=pdf.name)
 
-for _, fila in avance_area.iterrows():
-    if fila["Porcentaje_Avance"] < UMBRAL:
-        st.warning(
-            f"⚠️ Bajo avance en {fila['Área']} "
-            f"({fila['Porcentaje_Avance']:.1f}%)"
-        )
-        hay_alertas = True
+        else:
+            st.error("El archivo no coincide con la plantilla. Por favor, use la plantilla descargable.")
+    except Exception as e:
+        st.error(f"Error al procesar el archivo: {e}")
+else:
+    st.warning("Esperando carga de datos...")
 
-if not hay_alertas:
-    st.success("✅ Todas las áreas presentan un avance adecuado")
-
-st.divider()
-
-# -----------------------------------------------------
-# RANKING DE FRENTES
-# -----------------------------------------------------
-st.header("🏆 Ranking de Frentes de Trabajo")
-
-ranking = df.groupby("Área")["Porcentaje_Avance"].mean()
-ranking = ranking.sort_values(ascending=False)
-
-st.table(ranking.reset_index())
-
-st.divider()
-
-# -----------------------------------------------------
-# TABLA DETALLADA
-# -----------------------------------------------------
-st.header("📋 Detalle de Partidas")
-
-st.dataframe(df, use_container_width=True)
-
-st.divider()
-
-# -----------------------------------------------------
-# EXPORTACIÓN DE REPORTE
-# -----------------------------------------------------
-st.header("📄 Exportar Reporte")
-
-reporte = df.copy()
-
-csv = reporte.to_csv(index=False).encode("utf-8")
-
-st.download_button(
-    label="📥 Descargar reporte CSV",
-    data=csv,
-    file_name="reporte_seguimiento_obra.csv",
-    mime="text/csv"
-)
-
-st.success("Reporte generado a partir de datos reales")
-
-# -----------------------------------------------------
-# GENERACIÓN DE REPORTE PDF
-# -----------------------------------------------------
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.pagesizes import A4
-from datetime import datetime
-import io
-
-def generar_reporte_pdf(df, avance_global, avance_area):
-    buffer = io.BytesIO()
-
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=A4,
-        rightMargin=40,
-        leftMargin=40,
-        topMargin=40,
-        bottomMargin=40
-    )
-
-    styles = getSampleStyleSheet()
-    contenido = []
-
-    # ------------------ TÍTULO ------------------
-    contenido.append(
-        Paragraph("<b>INFORME DE SEGUIMIENTO DE OBRA</b>", styles["Title"])
-    )
-    contenido.append(Spacer(1, 12))
-
-    fecha = datetime.now().strftime("%d/%m/%Y")
-    contenido.append(Paragraph(f"<b>Fecha del informe:</b> {fecha}", styles["Normal"]))
-    contenido.append(Spacer(1, 12))
-
-    # ------------------ RESULTADOS ------------------
-    contenido.append(Paragraph("<b>1. RESULTADOS</b>", styles["Heading2"]))
-    contenido.append(Spacer(1, 8))
-
-    contenido.append(
-        Paragraph(
-            f"El proyecto presenta un avance físico global del "
-            f"<b>{avance_global:.2f}%</b>, calculado a partir de las cantidades "
-            f"ejecutadas en obra.",
-            styles["Normal"]
-        )
-    )
-    contenido.append(Spacer(1, 8))
-
-    contenido.append(
-        Paragraph(
-            f"Se registran un total de <b>{len(df)}</b> partidas de obra evaluadas.",
-            styles["Normal"]
-        )
-    )
-    contenido.append(Spacer(1, 8))
-
-    for _, fila in avance_area.iterrows():
-        contenido.append(
-            Paragraph(
-                f"• Área <b>{fila['Área']}</b>: avance promedio "
-                f"de <b>{fila['Porcentaje_Avance']:.2f}%</b>.",
-                styles["Normal"]
-            )
-        )
-
-    contenido.append(Spacer(1, 12))
-
-    # ------------------ CONCLUSIONES ------------------
-    contenido.append(Paragraph("<b>2. CONCLUSIONES</b>", styles["Heading2"]))
-    contenido.append(Spacer(1, 8))
-
-    if avance_global >= 75:
-        estado = "un estado general favorable"
-    elif avance_global >= 50:
-        estado = "un avance moderado que requiere seguimiento"
-    else:
-        estado = "un avance bajo que evidencia retrasos importantes"
-
-    contenido.append(
-        Paragraph(
-            f"El análisis de la información indica que la obra presenta "
-            f"{estado}.",
-            styles["Normal"]
-        )
-    )
-    contenido.append(Spacer(1, 8))
-
-    areas_criticas = avance_area[avance_area["Porcentaje_Avance"] < 50]
-
-    if not areas_criticas.empty:
-        contenido.append(
-            Paragraph(
-                "Se identifican áreas con avance inferior al 50%, lo cual "
-                "representa un riesgo para el cumplimiento del cronograma.",
-                styles["Normal"]
-            )
-        )
-    else:
-        contenido.append(
-            Paragraph(
-                "No se identifican áreas críticas con bajo rendimiento.",
-                styles["Normal"]
-            )
-        )
-
-    contenido.append(Spacer(1, 12))
-
-    # ------------------ RECOMENDACIONES ------------------
-    contenido.append(Paragraph("<b>3. RECOMENDACIONES</b>", styles["Heading2"]))
-    contenido.append(Spacer(1, 8))
-
-    contenido.append(
-        Paragraph(
-            "• Reforzar los frentes de trabajo con bajo rendimiento mediante "
-            "la redistribución de personal y recursos.",
-            styles["Normal"]
-        )
-    )
-    contenido.append(Spacer(1, 6))
-
-    contenido.append(
-        Paragraph(
-            "• Realizar un seguimiento semanal de las partidas críticas "
-            "para evitar retrasos acumulativos.",
-            styles["Normal"]
-        )
-    )
-    contenido.append(Spacer(1, 6))
-
-    contenido.append(
-        Paragraph(
-            "• Verificar el abastecimiento oportuno de materiales "
-            "para no afectar la productividad.",
-            styles["Normal"]
-        )
-    )
-
-    # ------------------ GENERAR PDF ------------------
-    doc.build(contenido)
-    buffer.seek(0)
-    return buffer
-
-pdf_buffer = generar_reporte_pdf(df, avance_global, avance_area)
-
-st.download_button(
-    label="📄 Descargar Reporte Técnico (PDF)",
-    data=pdf_buffer,
-    file_name="Informe_Seguimiento_Obra.pdf",
-    mime="application/pdf"
-)
 
 
 
