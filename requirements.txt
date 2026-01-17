@@ -6,4 +6,5 @@ PyPDF2
 openpyxl
 reportlab
 plotly
+Pillow
 
