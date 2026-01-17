@@ -18,8 +18,8 @@ st.set_page_config(
 # -----------------------------------------------------
 # LOGIN
 # -----------------------------------------------------
-USUARIO_VALIDO = "admin"
-CLAVE_VALIDA = "1234"
+USUARIO_VALIDO ="admin"
+CLAVE_VALIDA ="1234"
 
 if "autenticado" not in st.session_state:
     st.session_state.autenticado = False
@@ -331,6 +331,7 @@ st.download_button(
     file_name="Informe_Seguimiento_Obra.pdf",
     mime="application/pdf"
 )
+
 
 
 
