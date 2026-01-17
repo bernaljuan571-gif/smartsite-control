@@ -184,9 +184,9 @@ st.divider()
 # -----------------------------------------------------
 st.header("🚀 Propuesta de Valor")
 
-st.success("SmartSite Control transforma la obra tradicional en una obra inteligente,
-permitiendo decisiones basadas en datos, no en suposiciones.")
+st.success(" SmartSite Control transforma la obra tradicional en una obra inteligente, permitiendo decisiones basadas en datos, no en suposiciones.")
 
 st.caption("Smart Construction | Ecuador")
+
 
 
