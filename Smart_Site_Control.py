@@ -1,55 +1,38 @@
 # =====================================================
-# SMARTSITE CONTROL – SISTEMA INTELIGENTE DE SEGUIMIENTO DE OBRA
-# -----------------------------------------------------
-# Tecnologías:
-# - Streamlit (Dashboard Web)
-# - IA (Análisis de texto en informes PDF)
-# - Big Data (Lectura de Excel y múltiples fuentes)
-# - IoT (Simulación de sensores de obra)
-# -----------------------------------------------------
-# Descripción general:
-# La aplicación calcula automáticamente el avance de obra,
-# detecta retrasos, genera alertas, clasifica frentes de trabajo
-# y produce reportes, todo a partir de datos cargados por el usuario.
-# -----------------------------------------------------
-# Autor: Grupo#5 – Ingeniería Civil
-# =====================================================
-# =====================================================
-# SMARTSITE CONTROL – HACKATHON MVP
-# Prototipo Inteligente de Monitoreo de Obras
-# Enfoque: Innovación | Impacto | IA + IoT
-# Autor: Juan Bernal – Ingeniería Civil
+# SMARTSITE CONTROL – SEGUIMIENTO REAL DE OBRA
+# Autor: Grupo5 – Ingeniería Civil
 # =====================================================
 
 import streamlit as st
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import random
-
-st.set_page_config(page_title="SmartSite Control – Hackathon", layout="wide")
 
 # -----------------------------------------------------
-# LOGIN SIMPLE (USUARIO / CONTRASEÑA)
+# CONFIGURACIÓN INICIAL
 # -----------------------------------------------------
+st.set_page_config(
+    page_title="SmartSite Control",
+    page_icon="🏗️",
+    layout="wide"
+)
 
-USUARIO_CORRECTO = "admin"
-CLAVE_CORRECTA = "1234"
+# -----------------------------------------------------
+# LOGIN
+# -----------------------------------------------------
+USUARIO_VALIDO = "admin"
+CLAVE_VALIDA = "1234"
 
 if "autenticado" not in st.session_state:
     st.session_state.autenticado = False
 
 if not st.session_state.autenticado:
-    st.title("🔐 Acceso a SmartSite Control")
-    st.subheader("Dashboard de Monitoreo Inteligente de Obras")
+    st.title("🔐 Acceso al Sistema")
 
     usuario = st.text_input("Usuario")
     clave = st.text_input("Contraseña", type="password")
 
     if st.button("Ingresar"):
-        if usuario == USUARIO_CORRECTO and clave == CLAVE_CORRECTA:
+        if usuario == USUARIO_VALIDO and clave == CLAVE_VALIDA:
             st.session_state.autenticado = True
-            st.success("Acceso concedido")
             st.rerun()
         else:
             st.error("Usuario o contraseña incorrectos")
@@ -57,370 +40,299 @@ if not st.session_state.autenticado:
     st.stop()
 
 # -----------------------------------------------------
-# ENCABEZADO
+# APP PRINCIPAL
 # -----------------------------------------------------
-st.title("🚧 SMARTSITE CONTROL")
-st.subheader("Monitoreo Inteligente de Obras con IA + IoT")
-st.markdown("**Hackathon MVP | Innovación en Construcción**")
+st.title("🏗️ SmartSite Control")
+st.subheader("Sistema real de seguimiento de obra")
 
 st.divider()
 
 # -----------------------------------------------------
-# KPIs CLAVE (IMPACTO INMEDIATO)
+# CARGA DE ARCHIVO EXCEL
 # -----------------------------------------------------
-st.header("📊 Indicadores Clave en Tiempo Real")
+st.header("📂 Carga de información de obra")
 
-col1, col2, col3, col4 = st.columns(4)
-
-avance = random.randint(60, 95)
-calidad = random.randint(85, 98)
-seguridad = random.randint(90, 100)
-ahorro = random.randint(5, 15)
-
-col1.metric("Avance Global", f"{avance} %")
-col2.metric("Índice de Calidad", f"{calidad} %")
-col3.metric("Seguridad Operativa", f"{seguridad} %")
-col4.metric("Ahorro Proyectado", f"{ahorro} %")
-
-st.divider()
-
-# -----------------------------------------------------
-# PROGRESO PREDICTIVO (IA SIMULADA)
-# -----------------------------------------------------
-st.header("🤖 Predicción de Avance por IA")
-
-meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
-real = np.cumsum(np.random.randint(5, 15, 6))
-pred = real + np.random.randint(2, 6, 6)
-
-fig1, ax1 = plt.subplots()
-ax1.plot(meses, real, label="Avance Real", marker='o')
-ax1.plot(meses, pred, linestyle='--', label="Predicción IA")
-ax1.set_ylim(0, 100)
-ax1.legend()
-
-st.pyplot(fig1)
-
-st.info("La IA proyecta el avance futuro y detecta retrasos antes de que ocurran.")
-
-st.divider()
-
-# -----------------------------------------------------
-# MONITOREO IoT – MAQUINARIA
-# -----------------------------------------------------
-st.header("📡 Estado de Maquinaria (IoT)")
-
-maquinaria = ["Grúas", "Excavadoras", "Volquetas", "Elevadores", "Retroexcavadoras"]
-uso = np.random.randint(10, 40, len(maquinaria))
-
-fig2, ax2 = plt.subplots()
-ax2.bar(maquinaria, uso)
-ax2.set_ylabel("Uso (%)")
-
-st.pyplot(fig2)
-
-st.success("Sensores IoT permiten redistribuir equipos en tiempo real.")
-
-st.divider()
-
-# -----------------------------------------------------
-# -----------------------------------------------------
-# REGISTRO AUTOMATIZADO – DRONES
-# -----------------------------------------------------
-st.header("🚁 Registro Automatizado con Drones y Visión Artificial")
-
-col5, col6 = st.columns(2)
-
-with col5:
-    registros = pd.DataFrame({
-        "Fuente": ["Drones", "Cámaras 360°"],
-        "Cobertura (%)": [58, 42]
-    })
-    st.bar_chart(registros.set_index("Fuente"))
-
-with col6:
-    st.write("✔ Registro 360° sin puntos ciegos")
-    st.write("✔ Eliminación total del registro manual")
-    st.write("✔ Evidencia automática para fiscalización")
-
-st.divider()
-
-# -----------------------------------------------------
-# CARGA DE ARCHIVOS (DOCUMENTACIÓN DE OBRA)
-# -----------------------------------------------------
-st.header("📂 Carga de Archivos de Obra")
-
-st.write("Suba evidencias como planos, informes, fotos o reportes técnicos.")
-
-archivos = st.file_uploader(
-    "Seleccione uno o varios archivos",
-    type=["pdf", "jpg", "png", "xlsx", "docx"],
-    accept_multiple_files=True
+archivo = st.file_uploader(
+    "Suba el archivo Excel de seguimiento",
+    type=["xlsx"]
 )
 
-if archivos:
-    for archivo in archivos:
-        st.success(f"Archivo cargado: {archivo.name}")
-        st.write(f"Tipo: {archivo.type}")
-        st.write(f"Tamaño: {round(archivo.size / 1024, 2)} KB")
-
-st.info("Los archivos quedan asociados al proyecto para trazabilidad y control de calidad.")
+if archivo is None:
+    st.info("📌 Para continuar, cargue el archivo Excel con los datos reales de la obra.")
+    st.stop()
 
 # -----------------------------------------------------
+# LECTURA Y VALIDACIÓN DEL EXCEL
 # -----------------------------------------------------
-# ANALÍTICA AUTOMÁTICA (IA + BIG DATA)
-# Integración real: Excel + Texto + Pesos + Cronograma
-# -----------------------------------------------------
-st.header("🧠 Analítica Inteligente de Avance de Obra")
+try:
+    df = pd.read_excel(archivo)
+except Exception as e:
+    st.error("Error al leer el archivo Excel")
+    st.stop()
 
-st.write("Los indicadores se calculan automáticamente a partir de los archivos cargados.")
+columnas_obligatorias = [
+    "Actividad",
+    "Área",
+    "Unidad",
+    "Cantidad_Total",
+    "Cantidad_Ejecutada"
+]
 
-avance_estructura = 0
-avance_instalaciones = 0
-avance_acabados = 0
-
-# ---- 1. LECTURA DE EXCEL (METRADOS / AVANCE) ----
-for archivo in archivos or []:
-    if archivo.name.endswith('.xlsx'):
-        df = pd.read_excel(archivo)
-        if {'Actividad', 'Ejecutado', 'Total'}.issubset(df.columns):
-            df['Avance (%)'] = df['Ejecutado'] / df['Total'] * 100
-            avance_estructura += df['Avance (%)'].mean()
-
-# ---- 2. ANÁLISIS DE TEXTO (INFORMES PDF / WORD – SIMULADO) ----
-for archivo in archivos or []:
-    if archivo.name.endswith('.pdf') or archivo.name.endswith('.docx'):
-        texto = archivo.name.lower()
-        if 'estructura' in texto:
-            avance_estructura += 10
-        if 'instalacion' in texto:
-            avance_instalaciones += 10
-        if 'acabado' in texto:
-            avance_acabados += 10
-
-# ---- 3. PESOS POR ACTIVIDAD ----
-peso_estructura = 0.4
-peso_instalaciones = 0.3
-peso_acabados = 0.3
-
-avance_global = (
-    avance_estructura * peso_estructura +
-    avance_instalaciones * peso_instalaciones +
-    avance_acabados * peso_acabados
-)
-
-# ---- 4. CRONOGRAMA (SIMULADO) ----
-dias_planificados = 180
-dias_transcurridos = 120
-cumplimiento_cronograma = dias_transcurridos / dias_planificados * 100
-
-# ---- RESULTADOS ----
-data_resultados = pd.DataFrame({
-    'Indicador': ['Estructura', 'Instalaciones', 'Acabados', 'Cumplimiento Cronograma'],
-    'Avance (%)': [
-        min(100, avance_estructura),
-        min(100, avance_instalaciones),
-        min(100, avance_acabados),
-        cumplimiento_cronograma
-    ]
-})
-
-st.subheader("📊 Resultados calculados automáticamente")
-st.bar_chart(data_resultados.set_index('Indicador'))
-
-st.metric("Avance Global Ponderado", f"{round(min(100, avance_global), 1)} %")
-
-st.success("Los porcentajes se generan automáticamente a partir de datos reales cargados.")
+for col in columnas_obligatorias:
+    if col not in df.columns:
+        st.error(f"Falta la columna obligatoria: {col}")
+        st.stop()
 
 # -----------------------------------------------------
+# CÁLCULO DE PORCENTAJES
 # -----------------------------------------------------
-# IA REAL BÁSICA – LECTURA DE PDF + ALERTAS
-# -----------------------------------------------------
-st.header("🤖 IA: Análisis de Informes y Alertas Automáticas")
-
-from PyPDF2 import PdfReader
-
-alertas = []
-
-for archivo in archivos or []:
-    if archivo.name.endswith('.pdf'):
-        reader = PdfReader(archivo)
-        texto_pdf = "".join([p.extract_text() or "" for p in reader.pages]).lower()
-
-        if "retraso" in texto_pdf or "atraso" in texto_pdf:
-            alertas.append("⚠️ Posible retraso detectado en informe")
-        if "fisura" in texto_pdf or "falla" in texto_pdf:
-            alertas.append("⚠️ Riesgo estructural mencionado")
-        if "no conforme" in texto_pdf:
-            alertas.append("⚠️ No conformidad detectada")
-
-if alertas:
-    for alerta in set(alertas):
-        st.error(alerta)
-else:
-    st.success("No se detectaron alertas críticas en los informes analizados.")
-
-st.info("La IA analiza texto real de informes PDF para detectar riesgos y retrasos.")
-
-st.divider()
+df["Porcentaje_Avance"] = (
+    df["Cantidad_Ejecutada"] / df["Cantidad_Total"] * 100
+).round(2)
 
 # -----------------------------------------------------
+# MÉTRICAS GENERALES
 # -----------------------------------------------------
-# CONTROL INTELIGENTE: AVANCE FÍSICO VS CRONOGRAMA
-# -----------------------------------------------------
-st.header("📅 Control Inteligente de Cronograma")
+st.header("📊 Indicadores Generales")
 
-st.write("Comparación automática entre avance físico real y avance esperado según el tiempo.")
-
-# Valores base
-dias_planificados = st.number_input("Días totales planificados", value=180)
-dias_transcurridos = st.number_input("Días transcurridos", value=120)
-
-avance_esperado = dias_transcurridos / dias_planificados * 100
-avance_fisico = min(100, avance_global)
-
-colA, colB = st.columns(2)
-colA.metric("Avance Esperado", f"{round(avance_esperado,1)} %")
-colB.metric("Avance Físico Real", f"{round(avance_fisico,1)} %")
-
-if avance_fisico + 5 < avance_esperado:
-    st.error("🚨 Retraso crítico detectado")
-
-elif avance_fisico < avance_esperado:
-    st.warning("⚠️ Retraso leve detectado")
-
-else:
-    st.success("✅ Avance conforme al cronograma")
-
-
-st.divider()
-
-# -----------------------------------------------------
-# ALERTAS POR BAJO RENDIMIENTO POR ÁREA
-# -----------------------------------------------------
-st.header("🚨 Alertas de Rendimiento por Área")
-
-umbral = 50
-
-if avance_estructura < umbral:
-    st.warning("⚠️ Bajo rendimiento en Estructura")
-
-if avance_instalaciones < umbral:
-    st.warning("⚠️ Bajo rendimiento en Instalaciones")
-
-if avance_acabados < umbral:
-    st.warning("⚠️ Bajo rendimiento en Acabados")
-
-if (
-    avance_estructura >= umbral
-    and avance_instalaciones >= umbral
-    and avance_acabados >= umbral
-):
-    st.success("✅ Todas las áreas presentan rendimiento adecuado")
-
-
-st.divider()
-
-# -----------------------------------------------------
-# RANKING DE FRENTES DE TRABAJO
-# -----------------------------------------------------
-st.header("🏗️ Ranking de Frentes de Trabajo")
-
-ranking = pd.DataFrame({
-    "Frente": ["Estructura", "Instalaciones", "Acabados"],
-    "Avance (%)": [avance_estructura, avance_instalaciones, avance_acabados]
-}).sort_values(by="Avance (%)", ascending=False)
-
-st.table(ranking)
-
-st.info("Permite identificar frentes críticos y frentes eficientes.")
-
-st.divider()
-
-# -----------------------------------------------------
-# SIMULACIÓN DE SENSORES IoT
-# -----------------------------------------------------
-st.header("📡 Simulación de Sensores IoT")
-
-horas_maquina = np.random.randint(4, 10)
-personal_en_obra = np.random.randint(20, 80)
+avance_global = df["Porcentaje_Avance"].mean()
 
 col1, col2 = st.columns(2)
-col1.metric("Horas Máquina (promedio/día)", f"{horas_maquina} h")
-col2.metric("Personal en Obra", f"{personal_en_obra}")
+col1.metric("Avance Global (%)", f"{avance_global:.2f}")
 
-if horas_maquina < 6:
-    st.warning("⚠️ Subutilización de maquinaria detectada")
-else:
-    st.success("✅ Uso adecuado de maquinaria")
-
+total_partidas = len(df)
+col2.metric("Partidas Registradas", total_partidas)
 
 st.divider()
 
 # -----------------------------------------------------
-# EXPORTACIÓN DE REPORTE AUTOMÁTICO
+# AVANCE POR ÁREA
 # -----------------------------------------------------
-st.header("📄 Generación de Reporte Automático")
+st.header("🏗️ Avance por Área")
 
-reporte = pd.DataFrame({
-    "Indicador": ["Avance Global", "Avance Esperado", "Estructura", "Instalaciones", "Acabados"],
-    "Valor": [
-        f"{round(avance_global,1)} %",
-        f"{round(avance_esperado,1)} %",
-        f"{round(avance_estructura,1)} %",
-        f"{round(avance_instalaciones,1)} %",
-        f"{round(avance_acabados,1)} %"
-    ]
-})
+avance_area = (
+    df.groupby("Área")["Porcentaje_Avance"]
+    .mean()
+    .reset_index()
+)
+
+st.dataframe(avance_area, use_container_width=True)
+
+st.divider()
+
+# -----------------------------------------------------
+# ALERTAS REALES
+# -----------------------------------------------------
+st.header("🚨 Alertas Técnicas")
+
+UMBRAL = 50
+
+hay_alertas = False
+
+for _, fila in avance_area.iterrows():
+    if fila["Porcentaje_Avance"] < UMBRAL:
+        st.warning(
+            f"⚠️ Bajo avance en {fila['Área']} "
+            f"({fila['Porcentaje_Avance']:.1f}%)"
+        )
+        hay_alertas = True
+
+if not hay_alertas:
+    st.success("✅ Todas las áreas presentan un avance adecuado")
+
+st.divider()
+
+# -----------------------------------------------------
+# RANKING DE FRENTES
+# -----------------------------------------------------
+st.header("🏆 Ranking de Frentes de Trabajo")
+
+ranking = df.groupby("Área")["Porcentaje_Avance"].mean()
+ranking = ranking.sort_values(ascending=False)
+
+st.table(ranking.reset_index())
+
+st.divider()
+
+# -----------------------------------------------------
+# TABLA DETALLADA
+# -----------------------------------------------------
+st.header("📋 Detalle de Partidas")
+
+st.dataframe(df, use_container_width=True)
+
+st.divider()
+
+# -----------------------------------------------------
+# EXPORTACIÓN DE REPORTE
+# -----------------------------------------------------
+st.header("📄 Exportar Reporte")
+
+reporte = df.copy()
+
+csv = reporte.to_csv(index=False).encode("utf-8")
 
 st.download_button(
-    label="📥 Descargar Reporte (CSV)",
-    data=reporte.to_csv(index=False).encode('utf-8'),
-    file_name="reporte_control_obra.csv",
+    label="📥 Descargar reporte CSV",
+    data=csv,
+    file_name="reporte_seguimiento_obra.csv",
     mime="text/csv"
 )
 
-st.success("Reporte generado automáticamente a partir de los datos analizados.")
-
-st.divider()
+st.success("Reporte generado a partir de datos reales")
 
 # -----------------------------------------------------
-# SEGURIDAD INTELIGENTE
+# GENERACIÓN DE REPORTE PDF
 # -----------------------------------------------------
-st.header("🦺 Seguridad Predictiva")
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4
+from datetime import datetime
+import io
 
-riesgos = {
-    "Trabajo en Altura": random.randint(0, 5),
-    "Maquinaria Pesada": random.randint(0, 5),
-    "Riesgo Eléctrico": random.randint(0, 5)
-}
+def generar_reporte_pdf(df, avance_global, avance_area):
+    buffer = io.BytesIO()
 
-st.bar_chart(pd.DataFrame.from_dict(riesgos, orient='index'))
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=40,
+        leftMargin=40,
+        topMargin=40,
+        bottomMargin=40
+    )
 
-st.warning("El sistema genera alertas antes de que ocurra un incidente.")
+    styles = getSampleStyleSheet()
+    contenido = []
 
-st.divider()
+    # ------------------ TÍTULO ------------------
+    contenido.append(
+        Paragraph("<b>INFORME DE SEGUIMIENTO DE OBRA</b>", styles["Title"])
+    )
+    contenido.append(Spacer(1, 12))
 
-# -----------------------------------------------------
-# IMPACTO PARA EL HACKATHON
-# -----------------------------------------------------
-st.header("🌍 Impacto del Sistema")
+    fecha = datetime.now().strftime("%d/%m/%Y")
+    contenido.append(Paragraph(f"<b>Fecha del informe:</b> {fecha}", styles["Normal"]))
+    contenido.append(Spacer(1, 12))
 
-st.write("• Reduce accidentes laborales a cero")
-st.write("• Optimiza costos y plazos de obra")
-st.write("• Digitaliza completamente la supervisión")
-st.write("• Aplica IA y Big Data a la Ingeniería Civil")
+    # ------------------ RESULTADOS ------------------
+    contenido.append(Paragraph("<b>1. RESULTADOS</b>", styles["Heading2"]))
+    contenido.append(Spacer(1, 8))
 
-st.divider()
+    contenido.append(
+        Paragraph(
+            f"El proyecto presenta un avance físico global del "
+            f"<b>{avance_global:.2f}%</b>, calculado a partir de las cantidades "
+            f"ejecutadas en obra.",
+            styles["Normal"]
+        )
+    )
+    contenido.append(Spacer(1, 8))
 
-# -----------------------------------------------------
-# PROPUESTA DE VALOR
-# -----------------------------------------------------
-st.header("🚀 Propuesta de Valor")
+    contenido.append(
+        Paragraph(
+            f"Se registran un total de <b>{len(df)}</b> partidas de obra evaluadas.",
+            styles["Normal"]
+        )
+    )
+    contenido.append(Spacer(1, 8))
 
-st.success("SmartSite Control transforma la obra tradicional en una obra inteligente, permitiendo decisiones basadas en datos, no en suposiciones.")
+    for _, fila in avance_area.iterrows():
+        contenido.append(
+            Paragraph(
+                f"• Área <b>{fila['Área']}</b>: avance promedio "
+                f"de <b>{fila['Porcentaje_Avance']:.2f}%</b>.",
+                styles["Normal"]
+            )
+        )
 
-st.caption("Smart Construction | Ecuador")
+    contenido.append(Spacer(1, 12))
+
+    # ------------------ CONCLUSIONES ------------------
+    contenido.append(Paragraph("<b>2. CONCLUSIONES</b>", styles["Heading2"]))
+    contenido.append(Spacer(1, 8))
+
+    if avance_global >= 75:
+        estado = "un estado general favorable"
+    elif avance_global >= 50:
+        estado = "un avance moderado que requiere seguimiento"
+    else:
+        estado = "un avance bajo que evidencia retrasos importantes"
+
+    contenido.append(
+        Paragraph(
+            f"El análisis de la información indica que la obra presenta "
+            f"{estado}.",
+            styles["Normal"]
+        )
+    )
+    contenido.append(Spacer(1, 8))
+
+    areas_criticas = avance_area[avance_area["Porcentaje_Avance"] < 50]
+
+    if not areas_criticas.empty:
+        contenido.append(
+            Paragraph(
+                "Se identifican áreas con avance inferior al 50%, lo cual "
+                "representa un riesgo para el cumplimiento del cronograma.",
+                styles["Normal"]
+            )
+        )
+    else:
+        contenido.append(
+            Paragraph(
+                "No se identifican áreas críticas con bajo rendimiento.",
+                styles["Normal"]
+            )
+        )
+
+    contenido.append(Spacer(1, 12))
+
+    # ------------------ RECOMENDACIONES ------------------
+    contenido.append(Paragraph("<b>3. RECOMENDACIONES</b>", styles["Heading2"]))
+    contenido.append(Spacer(1, 8))
+
+    contenido.append(
+        Paragraph(
+            "• Reforzar los frentes de trabajo con bajo rendimiento mediante "
+            "la redistribución de personal y recursos.",
+            styles["Normal"]
+        )
+    )
+    contenido.append(Spacer(1, 6))
+
+    contenido.append(
+        Paragraph(
+            "• Realizar un seguimiento semanal de las partidas críticas "
+            "para evitar retrasos acumulativos.",
+            styles["Normal"]
+        )
+    )
+    contenido.append(Spacer(1, 6))
+
+    contenido.append(
+        Paragraph(
+            "• Verificar el abastecimiento oportuno de materiales "
+            "para no afectar la productividad.",
+            styles["Normal"]
+        )
+    )
+
+    # ------------------ GENERAR PDF ------------------
+    doc.build(contenido)
+    buffer.seek(0)
+    return buffer
+
+pdf_buffer = generar_reporte_pdf(df, avance_global, avance_area)
+
+st.download_button(
+    label="📄 Descargar Reporte Técnico (PDF)",
+    data=pdf_buffer,
+    file_name="Informe_Seguimiento_Obra.pdf",
+    mime="application/pdf"
+)
+
+
 
 
 
