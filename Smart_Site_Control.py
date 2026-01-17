@@ -284,9 +284,14 @@ colA.metric("Avance Esperado", f"{round(avance_esperado,1)} %")
 colB.metric("Avance Físico Real", f"{round(avance_fisico,1)} %")
 
 if avance_fisico + 5 < avance_esperado:
-    st.error("🚨 Retraso crítico detectado")nelif avance_fisico < avance_esperado:
-    st.warning("⚠️ Retraso leve detectado")nelse:
+    st.error("🚨 Retraso crítico detectado")
+
+elif avance_fisico < avance_esperado:
+    st.warning("⚠️ Retraso leve detectado")
+
+else:
     st.success("✅ Avance conforme al cronograma")
+
 
 st.divider()
 
@@ -404,6 +409,7 @@ st.header("🚀 Propuesta de Valor")
 st.success("SmartSite Control transforma la obra tradicional en una obra inteligente, permitiendo decisiones basadas en datos, no en suposiciones.")
 
 st.caption("Smart Construction | Ecuador")
+
 
 
 
