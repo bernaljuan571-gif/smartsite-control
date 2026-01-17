@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-st.set_page_config(page_title="SmartSite Control –", layout="wide")
+st.set_page_config(page_title="SmartSite Control", layout="wide")
 
 # -----------------------------------------------------
 # LOGIN SIMPLE (USUARIO / CONTRASEÑA)
@@ -109,6 +109,7 @@ st.success("Sensores IoT permiten redistribuir equipos en tiempo real.")
 st.divider()
 
 # -----------------------------------------------------
+# -----------------------------------------------------
 # REGISTRO AUTOMATIZADO – DRONES
 # -----------------------------------------------------
 st.header("🚁 Registro Automatizado con Drones y Visión Artificial")
@@ -130,6 +131,29 @@ with col6:
 st.divider()
 
 # -----------------------------------------------------
+# CARGA DE ARCHIVOS (DOCUMENTACIÓN DE OBRA)
+# -----------------------------------------------------
+st.header("📂 Carga de Archivos de Obra")
+
+st.write("Suba evidencias como planos, informes, fotos o reportes técnicos.")
+
+archivos = st.file_uploader(
+    "Seleccione uno o varios archivos",
+    type=["pdf", "jpg", "png", "xlsx", "docx"],
+    accept_multiple_files=True
+)
+
+if archivos:
+    for archivo in archivos:
+        st.success(f"Archivo cargado: {archivo.name}")
+        st.write(f"Tipo: {archivo.type}")
+        st.write(f"Tamaño: {round(archivo.size / 1024, 2)} KB")
+
+st.info("Los archivos quedan asociados al proyecto para trazabilidad y control de calidad.")
+
+st.divider()
+
+# -----------------------------------------------------
 # SEGURIDAD INTELIGENTE
 # -----------------------------------------------------
 st.header("🦺 Seguridad Predictiva")
@@ -145,9 +169,6 @@ st.bar_chart(pd.DataFrame.from_dict(riesgos, orient='index'))
 st.warning("El sistema genera alertas antes de que ocurra un incidente.")
 
 st.divider()
-
-# -----------------------------------------------------
-# IMPACTO PARA EL HACKATHON
 # -----------------------------------------------------
 st.header("🌍 Impacto del Sistema")
 
@@ -163,6 +184,9 @@ st.divider()
 # -----------------------------------------------------
 st.header("🚀 Propuesta de Valor")
 
-st.success("SmartSite Control transforma la obra tradicional en una obra inteligente,permitiendo decisiones basadas en datos, no en suposiciones.")
+st.success("SmartSite Control transforma la obra tradicional en una obra inteligente,
+permitiendo decisiones basadas en datos, no en suposiciones.")
 
-st.caption("Hackathon MVP | Smart Construction | Ecuador")
+st.caption("Smart Construction | Ecuador")
+
+
