@@ -303,11 +303,21 @@ st.header("🚨 Alertas de Rendimiento por Área")
 umbral = 50
 
 if avance_estructura < umbral:
-    st.warning("⚠️ Bajo rendimiento en Estructura")nif avance_instalaciones < umbral:
-    st.warning("⚠️ Bajo rendimiento en Instalaciones")nif avance_acabados < umbral:
-    st.warning("⚠️ Bajo rendimiento en Acabados")n
-if avance_estructura >= umbral and avance_instalaciones >= umbral and avance_acabados >= umbral:
+    st.warning("⚠️ Bajo rendimiento en Estructura")
+
+if avance_instalaciones < umbral:
+    st.warning("⚠️ Bajo rendimiento en Instalaciones")
+
+if avance_acabados < umbral:
+    st.warning("⚠️ Bajo rendimiento en Acabados")
+
+if (
+    avance_estructura >= umbral
+    and avance_instalaciones >= umbral
+    and avance_acabados >= umbral
+):
     st.success("✅ Todas las áreas presentan rendimiento adecuado")
+
 
 st.divider()
 
@@ -409,6 +419,7 @@ st.header("🚀 Propuesta de Valor")
 st.success("SmartSite Control transforma la obra tradicional en una obra inteligente, permitiendo decisiones basadas en datos, no en suposiciones.")
 
 st.caption("Smart Construction | Ecuador")
+
 
 
 
